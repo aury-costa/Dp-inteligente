@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>DP-Inteligente</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+<h1>DP-Inteligente</h1>
+<nav>
+<button onclick="show('dashboard')">🏠 Início</button>
+<button onclick="show('scan')">📤 Digitalizar</button>
+<button onclick="show('assinaturas')">✍️ Assinaturas</button>
+<button onclick="show('arquivo')">🔍 Arquivo Geral</button>
+<button onclick="show('colaboradores')">👥 Colaboradores</button>
+</nav>
+</header>
+
+<section id="dashboard" class="page">
+<h2>Dashboard</h2>
+<p>Resumo de documentos e pendências.</p>
+<div id="stats"></div>
+</section>
+
+<section id="scan" class="page hidden">
+<h2>Digitalizar / Upload</h2>
+<input type="file" id="fileInput" multiple>
+<button onclick="upload()">Enviar</button>
+<div id="uploadStatus"></div>
+</section>
+
+<section id="assinaturas" class="page hidden">
+<h2>Fila de Assinaturas</h2>
+<div id="assinaturasLista"></div>
+</section>
+
+<section id="arquivo" class="page hidden">
+<h2>Busca Inteligente</h2>
+<input type="text" id="busca" placeholder="Digite nome, CPF ou documento..." onkeyup="buscar()">
+<div id="resultados"></div>
+</section>
+
+<section id="colaboradores" class="page hidden">
+<h2>Colaboradores</h2>
+<div id="listaColaboradores"></div>
+</section>
+
+<script type="module" src="firebase.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
