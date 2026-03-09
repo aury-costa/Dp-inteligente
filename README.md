@@ -1,31 +1,21 @@
-# DP-Inteligente v2
+# DP-Inteligente v3
 
-Sistema web em HTML/CSS/JS para o Departamento Pessoal, compatível com **GitHub Pages + Firebase**.
+Sistema web em HTML/CSS/JS para Departamento Pessoal com:
 
-## O que esta versão já entrega
+- login da equipe pelo Firebase Authentication
+- upload de PDF e imagem
+- câmera do celular para captura rápida
+- OCR automático com Tesseract
+- leitura de PDF com OCR em PDF escaneado
+- busca tipo Google no conteúdo indexado
+- perfil por colaborador sem criar pasta manual
+- fila de assinatura com assinatura desenhada na tela
+- dashboard com alertas de vencimento
+- auditoria de login, upload, abertura, download, assinatura, edição e lixeira
+- lixeira com restauração
+- edição de metadados
 
-- Login da equipe do DP com **Firebase Authentication**
-- Upload de **imagem ou PDF**
-- **Scanner direto da câmera** no celular (`capture="environment"`)
-- **OCR automático** em imagens com **Tesseract.js**
-- Extração de texto de PDF com **PDF.js**
-- Detecção automática de:
-  - nome do colaborador
-  - CPF
-  - tipo do documento
-  - data do documento
-- Busca global tipo Google dentro do texto indexado
-- Perfil do colaborador sem criar pasta manual
-- Fila de assinatura eletrônica com desenho na tela
-- Dashboard com alertas de vencimento
-- Log de auditoria de:
-  - login
-  - upload
-  - abertura
-  - download
-  - assinatura
-
-## Arquivos principais
+## Arquivos
 
 - `index.html`
 - `style.css`
@@ -33,18 +23,23 @@ Sistema web em HTML/CSS/JS para o Departamento Pessoal, compatível com **GitHub
 - `firebase.js`
 - `main.js`
 
-## Publicação no GitHub Pages
+## Como publicar no GitHub Pages
 
-Suba todos os arquivos na raiz do repositório `Dp-inteligente`.
+1. Extraia o ZIP.
+2. Suba os arquivos para a raiz do repositório do GitHub Pages.
+3. Aguarde a publicação.
 
-## Firebase necessário
+## Configuração no Firebase
 
-### 1) Authentication
 Ative:
-- Email/Password
 
-### 2) Realtime Database
-Crie o banco e use inicialmente regras de teste:
+- Authentication > Sign-in method > Email/Password
+- Realtime Database
+- Storage
+
+## Regras iniciais de teste
+
+### Realtime Database
 
 ```json
 {
@@ -55,8 +50,7 @@ Crie o banco e use inicialmente regras de teste:
 }
 ```
 
-### 3) Storage
-Use inicialmente uma regra simples autenticada:
+### Storage
 
 ```txt
 rules_version = '2';
@@ -69,69 +63,16 @@ service firebase.storage {
 }
 ```
 
-## Observações importantes
+## Estrutura de dados usada
 
-### OCR em PDF
-- PDFs com texto digital: a leitura funciona bem com PDF.js.
-- PDFs escaneados como imagem podem precisar ser convertidos para imagem no frontend para OCR mais pesado. Esta versão já resolve bem imagens e PDFs com texto.
+- `documents`
+- `auditLogs`
+- `users`
 
-### Assinatura eletrônica
-- A assinatura é desenhada na tela e salva no Firebase Storage.
-- O sistema registra o status do documento como `assinado`.
+## Observações reais
 
-### Busca inteligente
-A busca considera:
-- nome do colaborador
-- CPF
-- tipo do documento
-- nome do arquivo
-- texto extraído pelo OCR
-- observações
-
-## Estrutura do banco esperada
-
-### `documents`
-Cada documento salvo contém, por exemplo:
-- `fileName`
-- `fileUrl`
-- `employeeName`
-- `cpf`
-- `type`
-- `documentDate`
-- `expiryDate`
-- `extractedText`
-- `requiresSignature`
-- `signatureStatus`
-- `signatureUrl`
-- `uploadedBy`
-- `uploadedAt`
-
-### `auditLogs`
-Cada log contém:
-- `action`
-- `docId`
-- `fileName`
-- `employeeName`
-- `userUid`
-- `userEmail`
-- `userName`
-- `timestamp`
-
-## Correção do erro da versão anterior
-O erro `Cannot use import statement outside a module` foi corrigido porque agora o carregamento do JS principal está assim:
-
-```html
-<script type="module" src="./main.js"></script>
-```
-
-E os botões não usam mais `onclick` inline; tudo foi migrado para listeners em JavaScript.
-
-## Próximas melhorias recomendadas
-
-- separação por permissões (admin, analista, somente leitura)
-- assinatura do colaborador por link externo
-- geração de PDF já assinado visualmente
-- tags automáticas mais avançadas
-- alerta por e-mail
-- dashboard com gráficos
-- exclusão lógica e lixeira
+- O OCR funciona muito melhor com foto nítida e documento bem enquadrado.
+- PDF com texto embutido é lido rápido.
+- PDF escaneado tenta OCR nas primeiras páginas.
+- A assinatura fica salva como imagem vinculada ao documento.
+- A marcação visual da assinatura dentro do próprio PDF ainda não está embutindo a assinatura no arquivo original; o sistema salva a assinatura associada ao documento.
