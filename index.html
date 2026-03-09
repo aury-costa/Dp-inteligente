@@ -1,286 +1,87 @@
-<!doctype html>
-<html lang="pt-BR">
+
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DP-Inteligente</title>
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="stylesheet" href="./style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.min.mjs" type="module"></script>
-  <script src="https://cdn.jsdelivr.net/npm/signature_pad@5.0.4/dist/signature_pad.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DP-Inteligente v4</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-  <div id="app" class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">DP</div>
-        <div>
-          <h1>DP-Inteligente</h1>
-          <p>Gestão documental do DP</p>
-        </div>
-      </div>
 
-      <nav class="nav">
-        <button class="nav-btn active" data-view="dashboard">🏠 Início</button>
-        <button class="nav-btn" data-view="capture">📷 Digitalizar</button>
-        <button class="nav-btn" data-view="archive">🔍 Arquivo Geral</button>
-        <button class="nav-btn" data-view="signatures">✍️ Assinaturas</button>
-        <button class="nav-btn" data-view="employees">👥 Colaboradores</button>
-        <button class="nav-btn" data-view="audit">📜 Auditoria</button>
-      </nav>
+<div class="sidebar">
+<h2>DP‑Inteligente</h2>
 
-      <div class="sidebar-footer">
-        <div id="userCard" class="user-card hidden">
-          <strong id="userName">-</strong>
-          <span id="userEmail">-</span>
-          <button id="logoutBtn" class="btn secondary full">Sair</button>
-        </div>
-      </div>
-    </aside>
+<button data-page="dashboard">🏠 Início</button>
+<button data-page="scan">📷 Digitalizar</button>
+<button data-page="arquivo">🔎 Arquivo</button>
+<button data-page="assinaturas">✍ Assinaturas</button>
+<button data-page="colaboradores">👥 Colaboradores</button>
+<button data-page="auditoria">📜 Auditoria</button>
+</div>
 
-    <main class="content">
-      <section id="authView" class="view auth-view">
-        <div class="auth-card glass">
-          <h2>Entrar no DP-Inteligente</h2>
-          <p>Use um login da equipe do Departamento Pessoal.</p>
-          <form id="loginForm" class="grid-form">
-            <label>
-              <span>E-mail</span>
-              <input type="email" id="loginEmail" placeholder="dp@empresa.com" required />
-            </label>
-            <label>
-              <span>Senha</span>
-              <input type="password" id="loginPassword" placeholder="••••••••" required />
-            </label>
-            <div class="row gap">
-              <button class="btn primary" type="submit">Entrar</button>
-              <button class="btn secondary" type="button" id="registerBtn">Criar acesso</button>
-            </div>
-          </form>
-          <small class="muted">No primeiro uso, clique em “Criar acesso”. Depois cadastre a equipe no Firebase Authentication.</small>
-        </div>
-      </section>
+<div class="content">
 
-      <section id="mainViews" class="hidden">
-        <header class="topbar glass">
-          <div>
-            <h2 id="viewTitle">Dashboard</h2>
-            <p id="viewSubtitle">Resumo de pendências e alertas do DP.</p>
-          </div>
-          <div class="row wrap gap">
-            <input id="globalSearchTop" class="search-input" type="search" placeholder="Buscar por colaborador, CPF, tipo ou trecho do documento" />
-            <button id="refreshBtn" class="btn secondary">Atualizar</button>
-          </div>
-        </header>
+<section id="dashboard" class="page">
+<h1>Dashboard</h1>
+<div id="stats"></div>
+</section>
 
-        <section id="dashboardView" class="view page-view">
-          <div class="stats-grid">
-            <article class="stat-card glass"><span>Total</span><strong id="statTotal">0</strong></article>
-            <article class="stat-card glass"><span>Pendentes assinatura</span><strong id="statPendingSign">0</strong></article>
-            <article class="stat-card glass"><span>Vencendo em 7 dias</span><strong id="statExpiring">0</strong></article>
-            <article class="stat-card glass"><span>Vencidos</span><strong id="statExpired">0</strong></article>
-          </div>
+<section id="scan" class="page hidden">
+<h1>Digitalizar Documento</h1>
 
-          <div class="grid-2">
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Inbox recente</h3>
-                <span class="muted">Novos documentos</span>
-              </div>
-              <div id="recentDocs" class="list"></div>
-            </article>
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Alertas de vencimento</h3>
-                <span class="muted">Atestados, licenças e documentos com data final</span>
-              </div>
-              <div id="alertsList" class="list"></div>
-            </article>
-          </div>
-        </section>
+<input type="file" id="fileInput" accept="image/*,.pdf">
+<button id="scanBtn">Processar documento</button>
 
-        <section id="captureView" class="view page-view hidden">
-          <div class="grid-2">
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Entrada / Scanner</h3>
-                <span class="muted">Fotos, PDFs e imagens</span>
-              </div>
-              <form id="uploadForm" class="grid-form">
-                <label>
-                  <span>Arquivo</span>
-                  <input id="docFile" type="file" accept="image/*,.pdf" capture="environment" required />
-                </label>
-                <div class="grid-2-inner">
-                  <label>
-                    <span>Tipo do documento</span>
-                    <select id="docType">
-                      <option value="">Detectar automaticamente</option>
-                      <option>Atestado</option>
-                      <option>Licença</option>
-                      <option>Férias</option>
-                      <option>Advertência</option>
-                      <option>Rescisão</option>
-                      <option>Admissão</option>
-                      <option>Exame</option>
-                      <option>Outro</option>
-                    </select>
-                  </label>
-                  <label>
-                    <span>Precisa assinatura?</span>
-                    <select id="requiresSignature">
-                      <option value="true">Sim</option>
-                      <option value="false">Não</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="grid-2-inner">
-                  <label>
-                    <span>Data do documento</span>
-                    <input id="docDate" type="date" />
-                  </label>
-                  <label>
-                    <span>Vencimento / validade</span>
-                    <input id="expiryDate" type="date" />
-                  </label>
-                </div>
-                <label>
-                  <span>Observação</span>
-                  <textarea id="notes" rows="3" placeholder="Ex.: entregue pelo colaborador às 08:40"></textarea>
-                </label>
-                <div class="row gap wrap">
-                  <button class="btn primary" type="submit">Processar documento</button>
-                  <button class="btn secondary" type="button" id="clearUploadBtn">Limpar</button>
-                </div>
-              </form>
-              <div id="uploadStatus" class="status-box"></div>
-            </article>
+<div id="preview"></div>
 
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Pré-visualização + OCR</h3>
-                <span class="muted">Leitura automática do nome e conteúdo</span>
-              </div>
-              <div id="previewWrap" class="preview-wrap empty">Nenhum arquivo selecionado.</div>
-              <div class="meta-grid">
-                <div><span>Colaborador identificado</span><strong id="ocrEmployee">-</strong></div>
-                <div><span>CPF identificado</span><strong id="ocrCpf">-</strong></div>
-                <div><span>Tipo sugerido</span><strong id="ocrType">-</strong></div>
-                <div><span>Data sugerida</span><strong id="ocrDate">-</strong></div>
-              </div>
-              <label>
-                <span>Texto extraído</span>
-                <textarea id="ocrText" rows="12" placeholder="O texto lido aparecerá aqui..."></textarea>
-              </label>
-            </article>
-          </div>
-        </section>
+<div class="meta">
+<label>Nome colaborador</label>
+<input id="nome">
 
-        <section id="archiveView" class="view page-view hidden">
-          <article class="panel glass">
-            <div class="panel-head wrap-between">
-              <div>
-                <h3>Arquivo Geral</h3>
-                <span class="muted">Busca tipo Google dentro dos documentos</span>
-              </div>
-              <div class="row gap wrap">
-                <input id="archiveSearch" class="search-input" type="search" placeholder="Nome, CPF, tipo, palavra do OCR..." />
-                <select id="archiveTypeFilter">
-                  <option value="">Todos os tipos</option>
-                  <option>Atestado</option>
-                  <option>Licença</option>
-                  <option>Férias</option>
-                  <option>Advertência</option>
-                  <option>Rescisão</option>
-                  <option>Admissão</option>
-                  <option>Exame</option>
-                  <option>Outro</option>
-                </select>
-                <select id="archiveStatusFilter">
-                  <option value="">Todos os status</option>
-                  <option value="pendente_assinatura">Pendente assinatura</option>
-                  <option value="assinado">Assinado</option>
-                  <option value="arquivado">Arquivado</option>
-                </select>
-              </div>
-            </div>
-            <div id="archiveResults" class="cards-grid"></div>
-          </article>
-        </section>
+<label>CPF</label>
+<input id="cpf">
 
-        <section id="signaturesView" class="view page-view hidden">
-          <div class="grid-2 signature-layout">
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Fila de assinaturas</h3>
-                <span class="muted">Selecione um documento pendente</span>
-              </div>
-              <div id="signatureQueue" class="list"></div>
-            </article>
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Assinatura eletrônica</h3>
-                <span class="muted">Desenhe a assinatura e conclua</span>
-              </div>
-              <div id="selectedSignatureDoc" class="signature-doc-empty">Nenhum documento selecionado.</div>
-              <canvas id="signatureCanvas" width="700" height="280"></canvas>
-              <div class="row gap wrap">
-                <button id="clearSignatureBtn" class="btn secondary">Limpar assinatura</button>
-                <button id="saveSignatureBtn" class="btn primary">Salvar assinatura</button>
-              </div>
-            </article>
-          </div>
-        </section>
+<label>Tipo documento</label>
+<input id="tipo">
 
-        <section id="employeesView" class="view page-view hidden">
-          <div class="grid-2 employees-layout">
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Colaboradores</h3>
-                <span class="muted">Clique em um nome para filtrar tudo dele</span>
-              </div>
-              <input id="employeeSearch" class="search-input" type="search" placeholder="Buscar colaborador" />
-              <div id="employeeList" class="list"></div>
-            </article>
-            <article class="panel glass">
-              <div class="panel-head">
-                <h3>Perfil documental</h3>
-                <span class="muted">Todos os documentos do colaborador selecionado</span>
-              </div>
-              <div id="employeeProfile" class="empty-profile">Selecione um colaborador.</div>
-            </article>
-          </div>
-        </section>
+<label>Data</label>
+<input id="data">
 
-        <section id="auditView" class="view page-view hidden">
-          <article class="panel glass">
-            <div class="panel-head">
-              <h3>Log de auditoria</h3>
-              <span class="muted">Aberturas, assinaturas, downloads e ações</span>
-            </div>
-            <div id="auditLog" class="list"></div>
-          </article>
-        </section>
-      </section>
-    </main>
-  </div>
+<button id="saveDoc">Salvar documento</button>
+</div>
 
-  <template id="docCardTemplate">
-    <article class="doc-card glass">
-      <div class="doc-card-top">
-        <div>
-          <h4 class="doc-name"></h4>
-          <p class="doc-sub"></p>
-        </div>
-        <span class="chip doc-status"></span>
-      </div>
-      <p class="doc-snippet"></p>
-      <div class="doc-meta"></div>
-      <div class="row gap wrap doc-actions"></div>
-    </article>
-  </template>
+</section>
 
-  <script type="module" src="./main.js"></script>
+<section id="arquivo" class="page hidden">
+<h1>Busca Inteligente</h1>
+<input id="search" placeholder="Nome, CPF ou texto...">
+<div id="results"></div>
+</section>
+
+<section id="assinaturas" class="page hidden">
+<h1>Assinaturas</h1>
+<canvas id="signPad"></canvas>
+<button id="clearSign">Limpar</button>
+<button id="saveSign">Salvar assinatura</button>
+</section>
+
+<section id="colaboradores" class="page hidden">
+<h1>Colaboradores</h1>
+<div id="listaColab"></div>
+</section>
+
+<section id="auditoria" class="page hidden">
+<h1>Logs do Sistema</h1>
+<div id="logs"></div>
+</section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/app.js"></script>
+
 </body>
 </html>

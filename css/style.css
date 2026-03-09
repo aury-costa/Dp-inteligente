@@ -1,0 +1,52 @@
+
+body{
+margin:0;
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+}
+
+.sidebar{
+width:220px;
+background:#020617;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.sidebar button{
+padding:10px;
+border:none;
+border-radius:6px;
+background:#1d4ed8;
+color:white;
+cursor:pointer;
+}
+
+.content{
+flex:1;
+padding:30px;
+}
+
+.page.hidden{
+display:none;
+}
+
+input{
+padding:8px;
+margin-bottom:10px;
+width:300px;
+}
+
+#preview img{
+max-width:400px;
+border:2px solid #22c55e;
+}
+
+canvas{
+border:1px solid white;
+width:400px;
+height:200px;
+}
